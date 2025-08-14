@@ -95,33 +95,24 @@
                 <p>Enter your website URL to get a comprehensive SEO analysis and AI implementation report</p>
             </div>
             
-                        <div class="calculator-container">
-                                <form id="seo-form" class="seo-form">
-                                    <input id="url" type="url" placeholder="https://example.com" required />
-                                    <button id="analyzeBtn" type="submit" class="cta-btn">Analyze SEO</button>
-                                </form>
+            <div class="calc-card">
+              <form id="seo-form" class="calc-form">
+                <label for="url" class="calc-label">Website URL</label>
+                <div class="calc-row">
+                  <input id="url" type="url" class="calc-input" placeholder="https://example.com" required />
+                  <button id="analyzeBtn" type="submit" class="calc-btn">Analyze SEO</button>
+                </div>
+              </form>
 
-                                <!-- Analysis status (hidden by default) -->
-                                <div id="analysis-status" class="analysis-status hidden" aria-live="polite">
-                                  <span class="dots" aria-hidden="true">
-                                    <i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i>
-                                  </span>
-                                  <span id="analysis-text">Analyzing your website…</span>
-                                </div>
-
-                                <div id="status" class="status hidden" aria-live="polite">
-                                    <span class="loader" aria-hidden="true"></span>
-                                    <span id="statusText">Analyzing your website…</span>
-                                </div>
-
-                                <div id="error" class="status error hidden" role="alert"></div>
-
-                                <div id="results" class="results hidden"></div>
-
-                                <div id="downloadWrap" class="hidden">
-                                    <button id="downloadJson" class="cta-btn secondary">Download JSON</button>
-                                    <button id="downloadPdf" class="cta-btn secondary">Download Report (PDF)</button>
-                                </div>
+              <!-- Animation/status line (hidden by default) -->
+              <div id="analysis-status" class="analysis-status hidden" aria-live="polite">
+                <span class="dots" aria-hidden="true">
+                  <i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i>
+                </span>
+                <span id="analysis-text">Analyzing your website…</span>
+              </div>
+            </div>
+        </div>
     </section>
 
     <!-- Features Section -->

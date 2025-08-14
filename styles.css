@@ -653,27 +653,48 @@ body {
     color: #9ca3af;
 }
 
-/* status row */
+/* Calculator card (old style restored) */
+.calc-card{
+  max-width: 760px; margin: 0 auto; padding: 24px;
+  background:#fff; border-radius:18px;
+  box-shadow: 0 18px 60px rgba(2,6,23,.06);
+}
+.calc-label{ display:block; font-weight:600; color:#0f172a; margin:0 0 10px; }
+.calc-row{ display:flex; gap:12px; align-items:center; }
+.calc-input{
+  flex:1; height:54px; padding:0 16px; font-size:16px;
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+  outline: none;
+}
+.calc-input:focus{ border-color:#a78bfa; box-shadow:0 0 0 3px rgba(167,139,250,.25); }
+.calc-btn{
+  height:54px; padding:0 22px; border:0; border-radius:12px; cursor:pointer;
+  font-weight:700; font-size:16px; color:#fff; background:#6d28d9; /* purple */
+  box-shadow: 0 10px 30px rgba(109,40,217,.35);
+  transition: transform .06s ease, box-shadow .2s ease;
+}
+.calc-btn:hover{ transform: translateY(-1px); box-shadow: 0 14px 36px rgba(109,40,217,.45); }
+.calc-btn:disabled{ opacity:.65; cursor:not-allowed; }
+
+@media (max-width: 640px){
+  .calc-row{ flex-direction:column; align-items:stretch; }
+  .calc-btn{ width:100%; }
+}
+
+/* Subtle 3-dot loader under the calculator */
 .analysis-status{
   display:flex; align-items:center; gap:10px;
-  margin-top:12px; color:#64748b; /* slate-500 */
-  font-size:0.95rem;
+  margin-top:12px; color:#64748b; font-size:0.95rem;
 }
 .analysis-status .dot{
   display:inline-block; width:8px; height:8px; margin-right:4px;
-  border-radius:9999px; background:#7c3aed; /* your purple */
-  opacity:.35; transform:scale(.8);
+  border-radius:9999px; background:#7c3aed; opacity:.35; transform:scale(.8);
   animation: dotPulse 1.2s ease-in-out infinite;
 }
 .analysis-status .d2{ animation-delay:.15s }
 .analysis-status .d3{ animation-delay:.30s }
-
-@keyframes dotPulse{
-  0%,80%,100%{ transform:scale(.8); opacity:.35 }
-  40%{ transform:scale(1.25); opacity:1 }
-}
-
-.hidden{ display:none !important; } /* if you don’t already have one */
+@keyframes dotPulse{ 0%,80%,100%{transform:scale(.8);opacity:.35} 40%{transform:scale(1.25);opacity:1} }
+.hidden{ display:none !important; }
 
 /* Responsive Design */
 @media (max-width: 768px) {

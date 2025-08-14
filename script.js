@@ -10,15 +10,10 @@ class SEOCalculator {
         this.aiDetails = document.getElementById('ai-details');
         this.aiReport = document.getElementById('ai-report');
 
-        // Add status message and spinner
-        this.statusMsg = document.createElement('div');
-        this.statusMsg.id = 'analysis-status';
-        this.statusMsg.style.textAlign = 'center';
-        this.statusMsg.style.margin = '1rem 0';
-        this.statusMsg.style.fontWeight = '500';
-        this.statusMsg.style.color = '#4f46e5';
-        this.statusMsg.innerHTML = '';
-        this.resultsContainer.parentNode.insertBefore(this.statusMsg, this.resultsContainer);
+        // status elements
+        this.statusEl  = document.getElementById('analysis-status');
+        this.statusTxt = document.getElementById('analysis-text');
+        this.stageTimers = [];
 
         this.initEventListeners();
     }
@@ -33,54 +28,34 @@ class SEOCalculator {
     }
 
     // --- loading UI helpers ---
-    startAnalysisUI() {
-        this.statusMsg.innerHTML = 'Analyzing your website…';
-        this.statusMsg.classList.remove('hidden');
-
-        // progressive messages so users know it’s alive during cold starts
-        this.stageTimers = [
-            setTimeout(() => this.statusMsg.innerHTML = 'Warming the analysis engine…', 900),
-            setTimeout(() => this.statusMsg.innerHTML = 'Fetching and parsing HTML…', 2500),
-            setTimeout(() => this.statusMsg.innerHTML = 'Still working… some sites are slow to respond.', 5000),
-            setTimeout(() => this.statusMsg.innerHTML = 'Almost there… generating your summary.', 8000)
-        ];
+    startAnalysisUI(){
+      this.statusTxt.textContent = 'Analyzing your website…';
+      this.statusEl.classList.remove('hidden');
+      this.stageTimers = [
+        setTimeout(()=> this.statusTxt.textContent = 'Warming the analysis engine…', 900),
+        setTimeout(()=> this.statusTxt.textContent = 'Fetching and parsing HTML…', 2500),
+        setTimeout(()=> this.statusTxt.textContent = 'Still working… some sites are slow.', 5000),
+        setTimeout(()=> this.statusTxt.textContent = 'Almost there… compiling your summary.', 8000),
+      ];
     }
-
-    stopAnalysisUI() {
-        this.stageTimers.forEach(clearTimeout);
-        this.stageTimers = [];
-        this.statusMsg.classList.add('hidden');
-    }
-
-    failAnalysisUI(msg) {
-        this.stageTimers.forEach(clearTimeout);
-        this.stageTimers = [];
-        this.statusMsg.innerHTML = msg || 'Something went wrong.';
-        // keep the row visible for a moment so the message is readable
-        setTimeout(() => this.statusMsg.classList.add('hidden'), 3000);
-    }
+    stopAnalysisUI(){ this.stageTimers.forEach(clearTimeout); this.stageTimers=[]; this.statusEl.classList.add('hidden'); }
+    failAnalysisUI(msg){ this.stageTimers.forEach(clearTimeout); this.stageTimers=[]; this.statusTxt.textContent = msg; setTimeout(()=>this.statusEl.classList.add('hidden'), 3000); }
 
     async analyzeWebsite() {
-        (function(){
+        (async () => {
+        let url = this.urlInput.value.trim();
         if (!this.validateURL(url)) {
             this.showError('Invalid URL');
             return;
         }
         this.startAnalysisUI();
 
-        // Simulate API call
-        setTimeout(() => {
-            // Mocked response
-            let data = {
-                score: 85,
-                robots: 'index, follow',
-                viewport: true,
-                og_count: 5,
-                twitter_count: 2,
-                jsonld_count: 3,
-                jsonld_types: ['Article', 'WebSite'],
-                recommendations: ['Improve page speed', 'Add more internal links']
-            };
+        const ac = new AbortController();
+        const to = setTimeout(() => ac.abort(), 20000);
+        try {
+            const res = await fetch(`/api/analyze?url=${encodeURIComponent(url)}`, { signal: ac.signal });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || `API ${res.status}`);
 
             this.stopAnalysisUI();
             this.showResults(data);
@@ -97,8 +72,15 @@ class SEOCalculator {
                   data.recommendations.map(x=>`<li>${x}</li>`).join('')
                 }</ul>` : ''}
             `;
-        }, 2000);
-        }).call(this);
+        } catch (err) {
+            if (err.name === 'AbortError') this.failAnalysisUI('Request timed out. Please try again.');
+            else if ((err.message||'').includes('Failed to fetch')) this.failAnalysisUI('Backend unavailable. Try again.');
+            else this.failAnalysisUI(err.message || 'Something went wrong.');
+            throw err;
+        } finally {
+            clearTimeout(to);
+        }
+        })();
     }
 
     validateURL(url) {
@@ -145,4 +127,10 @@ class SEOCalculator {
 
 document.addEventListener('DOMContentLoaded', () => {
     new SEOCalculator();
+});
+
+document.getElementById('seo-form').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const url = document.getElementById('url').value.trim();
+  runAnalysis(url);
 });
