@@ -32,14 +32,41 @@ class SEOCalculator {
         });
     }
 
+    // --- loading UI helpers ---
+    startAnalysisUI() {
+        this.statusMsg.innerHTML = 'Analyzing your website…';
+        this.statusMsg.classList.remove('hidden');
+
+        // progressive messages so users know it’s alive during cold starts
+        this.stageTimers = [
+            setTimeout(() => this.statusMsg.innerHTML = 'Warming the analysis engine…', 900),
+            setTimeout(() => this.statusMsg.innerHTML = 'Fetching and parsing HTML…', 2500),
+            setTimeout(() => this.statusMsg.innerHTML = 'Still working… some sites are slow to respond.', 5000),
+            setTimeout(() => this.statusMsg.innerHTML = 'Almost there… generating your summary.', 8000)
+        ];
+    }
+
+    stopAnalysisUI() {
+        this.stageTimers.forEach(clearTimeout);
+        this.stageTimers = [];
+        this.statusMsg.classList.add('hidden');
+    }
+
+    failAnalysisUI(msg) {
+        this.stageTimers.forEach(clearTimeout);
+        this.stageTimers = [];
+        this.statusMsg.innerHTML = msg || 'Something went wrong.';
+        // keep the row visible for a moment so the message is readable
+        setTimeout(() => this.statusMsg.classList.add('hidden'), 3000);
+    }
+
     async analyzeWebsite() {
-        // SEO Calculator JavaScript
         (function(){
         if (!this.validateURL(url)) {
             this.showError('Invalid URL');
             return;
         }
-        this.showStatus('Analyzing website...');
+        this.startAnalysisUI();
 
         // Simulate API call
         setTimeout(() => {
@@ -55,7 +82,7 @@ class SEOCalculator {
                 recommendations: ['Improve page speed', 'Add more internal links']
             };
 
-            this.showStatus('');
+            this.stopAnalysisUI();
             this.showResults(data);
 
             // Extended results rendering

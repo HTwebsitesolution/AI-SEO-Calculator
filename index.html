@@ -101,6 +101,14 @@
                                     <button id="analyzeBtn" type="submit" class="cta-btn">Analyze SEO</button>
                                 </form>
 
+                                <!-- Analysis status (hidden by default) -->
+                                <div id="analysis-status" class="analysis-status hidden" aria-live="polite">
+                                  <span class="dots" aria-hidden="true">
+                                    <i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i>
+                                  </span>
+                                  <span id="analysis-text">Analyzing your website…</span>
+                                </div>
+
                                 <div id="status" class="status hidden" aria-live="polite">
                                     <span class="loader" aria-hidden="true"></span>
                                     <span id="statusText">Analyzing your website…</span>

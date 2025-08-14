@@ -653,6 +653,28 @@ body {
     color: #9ca3af;
 }
 
+/* status row */
+.analysis-status{
+  display:flex; align-items:center; gap:10px;
+  margin-top:12px; color:#64748b; /* slate-500 */
+  font-size:0.95rem;
+}
+.analysis-status .dot{
+  display:inline-block; width:8px; height:8px; margin-right:4px;
+  border-radius:9999px; background:#7c3aed; /* your purple */
+  opacity:.35; transform:scale(.8);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.analysis-status .d2{ animation-delay:.15s }
+.analysis-status .d3{ animation-delay:.30s }
+
+@keyframes dotPulse{
+  0%,80%,100%{ transform:scale(.8); opacity:.35 }
+  40%{ transform:scale(1.25); opacity:1 }
+}
+
+.hidden{ display:none !important; } /* if you don’t already have one */
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .hero-title {
