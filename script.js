@@ -9,7 +9,17 @@ class SEOCalculator {
         this.aiStatus = document.getElementById('ai-status');
         this.aiDetails = document.getElementById('ai-details');
         this.aiReport = document.getElementById('ai-report');
-        
+
+        // Add status message and spinner
+        this.statusMsg = document.createElement('div');
+        this.statusMsg.id = 'analysis-status';
+        this.statusMsg.style.textAlign = 'center';
+        this.statusMsg.style.margin = '1rem 0';
+        this.statusMsg.style.fontWeight = '500';
+        this.statusMsg.style.color = '#4f46e5';
+        this.statusMsg.innerHTML = '';
+        this.resultsContainer.parentNode.insertBefore(this.statusMsg, this.resultsContainer);
+
         this.initEventListeners();
     }
 
@@ -24,23 +34,30 @@ class SEOCalculator {
 
     async analyzeWebsite() {
         const url = this.urlInput.value.trim();
-        
+
         if (!this.validateURL(url)) {
             this.showError('Please enter a valid URL (e.g., https://example.com)');
             return;
         }
 
         this.setLoadingState(true);
-        
+        this.statusMsg.innerHTML = '<span class="spinner" style="display:inline-block;width:24px;height:24px;border:3px solid #e5e7eb;border-top:3px solid #4f46e5;border-radius:50%;animation:spin 1s linear infinite;vertical-align:middle;margin-right:8px;"></span>Analyzing… may take a few seconds on first run.';
+
         try {
             // Simulate API call with realistic delay
             await this.delay(2000);
-            
+
             const analysisData = await this.performAnalysis(url);
             this.displayResults(analysisData);
-            
+            this.statusMsg.innerHTML = '';
         } catch (error) {
-            this.showError('Analysis failed. Please try again.');
+            // Friendly error for site blocks or network issues
+            if (error && error.message && (error.message.includes('502') || error.message.includes('504'))) {
+                this.statusMsg.innerHTML = '<span style="color:#d97706;font-weight:600;">Site may be blocking bots or is unreachable.<br>For best results, try pasting the site HTML (feature coming soon).</span>';
+            } else {
+                this.statusMsg.innerHTML = '';
+                this.showError('Analysis failed. Please try again.');
+            }
             console.error('Analysis error:', error);
         } finally {
             this.setLoadingState(false);
@@ -61,6 +78,13 @@ class SEOCalculator {
             this.analyzeBtn.classList.add('loading');
             this.analyzeBtn.disabled = true;
             this.resultsContainer.classList.add('hidden');
+            // Hide metrics until analysis completes
+            this.seoScore.textContent = '';
+            this.scoreBreakdown.innerHTML = '';
+            this.aiStatus.querySelector('.status-icon').textContent = '';
+            this.aiStatus.querySelector('.status-text').textContent = '';
+            this.aiDetails.innerHTML = '';
+            this.aiReport.innerHTML = '';
         } else {
             this.analyzeBtn.classList.remove('loading');
             this.analyzeBtn.disabled = false;
@@ -359,7 +383,7 @@ class SEOCalculator {
 
     showError(message) {
         // Simple error display - could be enhanced with a toast notification
-        alert(message);
+        this.statusMsg.innerHTML = `<span style="color:#d97706;font-weight:600;">${message}</span>`;
     }
 
     delay(ms) {
@@ -386,6 +410,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+
 // Add some interactive animations
 const observerOptions = {
     threshold: 0.1,
@@ -411,3 +436,8 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(card);
     });
 });
+
+// Spinner animation keyframes
+const style = document.createElement('style');
+style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+document.head.appendChild(style);
