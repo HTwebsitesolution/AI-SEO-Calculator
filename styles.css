@@ -1,3 +1,18 @@
+/* Spinner and status utilities */
+.loader{
+    width:24px;height:24px;border-radius:50%;
+    border:3px solid #e5e7eb;border-top-color:#7c3aed;
+    display:inline-block;vertical-align:middle;margin-right:8px;
+    animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.status{margin-top:10px;font-size:.95rem;color:#475569}
+.status.error{color:#b91c1c}
+.hidden{display:none!important}
+
+.results{margin-top:16px;padding:16px;border-radius:12px;background:#f8fafc}
+.cta-btn.secondary{background:#fff;border:1px solid #e5e7eb;color:#111827;margin-right:8px}
 /* Header CTA Button */
 .nav-cta-btn.cta-btn {
     background: linear-gradient(135deg, #fbbf24, #f59e0b);

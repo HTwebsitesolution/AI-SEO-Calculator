@@ -71,8 +71,8 @@
                 </p>
                 <div class="hero-stats">
                     <div class="stat">
-                        <span class="stat-number">50K+</span>
-                        <span class="stat-label">Websites Analyzed</span>
+                        <span class="stat-number">Live</span>
+                        <span class="stat-label">Website Analysis</span>
                     </div>
                     <div class="stat">
                         <span class="stat-number">95%</span>
@@ -95,49 +95,25 @@
                 <p>Enter your website URL to get a comprehensive SEO analysis and AI implementation report</p>
             </div>
             
-            <div class="calculator-container">
-                <div class="calculator-form">
-                    <div class="form-group">
-                        <label for="website-url">Website URL</label>
-                        <div class="input-wrapper">
-                            <input 
-                                type="url" 
-                                id="website-url" 
-                                placeholder="https://example.com"
-                                required
-                            >
-                            <button type="button" id="analyze-btn" class="analyze-btn">
-                                <span class="btn-text">Analyze SEO</span>
-                                <span class="btn-loader"></span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                        <div class="calculator-container">
+                                <form id="seo-form" class="seo-form">
+                                    <input id="url" type="url" placeholder="https://example.com" required />
+                                    <button id="analyzeBtn" type="submit" class="cta-btn">Analyze SEO</button>
+                                </form>
 
-                <!-- Results Container -->
-                <div id="results-container" class="results-container hidden">
-                    <!-- SEO Score -->
-                    <div class="result-card seo-score-card">
-                        <h3>SEO Score</h3>
-                        <div class="score-circle">
-                            <div class="score-value" id="seo-score">0</div>
-                            <div class="score-label">/ 100</div>
-                        </div>
-                        <div class="score-breakdown" id="score-breakdown"></div>
-                    </div>
+                                <div id="status" class="status hidden" aria-live="polite">
+                                    <span class="loader" aria-hidden="true"></span>
+                                    <span id="statusText">Analyzing your website…</span>
+                                </div>
 
-                    <!-- AI Detection -->
-                    <div class="result-card ai-detection-card">
-                        <h3>AI Implementation Status</h3>
-                        <div class="ai-status" id="ai-status">
-                            <div class="status-icon"></div>
-                            <div class="status-text"></div>
-                        </div>
-                        <div class="ai-details" id="ai-details"></div>
-                    </div>
+                                <div id="error" class="status error hidden" role="alert"></div>
 
-                    <!-- Recommendations -->
-                    <div class="result-card recommendations-card">
+                                <div id="results" class="results hidden"></div>
+
+                                <div id="downloadWrap" class="hidden">
+                                    <button id="downloadJson" class="cta-btn secondary">Download JSON</button>
+                                    <button id="downloadPdf" class="cta-btn secondary">Download Report (PDF)</button>
+                                </div>
     </section>
 
     <!-- Features Section -->
