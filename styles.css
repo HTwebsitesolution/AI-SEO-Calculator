@@ -313,6 +313,8 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.result-card p{ margin:6px 0 }
+
 /* SEO Score Card */
 .seo-score-card {
     text-align: center;
@@ -696,6 +698,19 @@ body {
 @keyframes dotPulse{ 0%,80%,100%{transform:scale(.8);opacity:.35} 40%{transform:scale(1.25);opacity:1} }
 .hidden{ display:none !important; }
 
+/* Results card */
+.results{ margin-top:16px; padding:16px; border-radius:12px; background:#f8fafc }
+.result-card p{ margin:6px 0 }
+
+/* Paste-HTML box */
+.paste-box{
+  margin-top:14px; border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff;
+}
+.paste-summary{ cursor:pointer; font-weight:600; margin-bottom:10px; }
+.paste-box .calc-input#htmlTextarea{
+  height:auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; line-height:1.35;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .hero-title {
@@ -757,4 +772,15 @@ body {
 
 .result-card:nth-child(3) {
     animation-delay: 0.4s;
+}
+
+/* Paste-HTML box */
+.paste-box{
+  max-width:760px; margin:16px auto 0; display:block;
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:16px;
+}
+.paste-summary{ cursor:pointer; font-weight:600; margin-bottom:12px; }
+.paste-html .calc-input#htmlTextarea{
+  height:auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  line-height:1.35;
 }
