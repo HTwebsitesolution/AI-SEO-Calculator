@@ -1,4 +1,19 @@
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, HttpUrl
+from bs4 import BeautifulSoup
+import httpx, socket, ipaddress, re, os, json
 from urllib.parse import urljoin
+from cachetools import TTLCache
+
+# --- std/3p imports -------------------------------------------------------
+app = FastAPI()
+
+NETLIFY_ORIGIN = os.getenv("NETLIFY_ORIGIN", "https://ai-seo-calculator.netlify.app")
+USER_AGENT     = "AI-SEO-Calculator/1.0 (+https://ai-seo-calculator.netlify.app)"
+
+cache = TTLCache(maxsize=1000, ttl=900)
 
 # --- Paste-HTML analysis ----------------------------------------------------
 from pydantic import BaseModel
