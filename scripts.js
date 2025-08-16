@@ -8,6 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusEl  = document.getElementById('analysis-status');
   const statusTxt = document.getElementById('analysis-text');
   const results   = document.getElementById('results');
+  const suggestBlock = document.getElementById('suggest-block');
+  const genSuggestBtn = document.getElementById('genSuggest');
+  const suggestResults = document.getElementById('suggestResults');
+  const suggestTitle = document.getElementById('suggestTitle');
+  const suggestMeta = document.getElementById('suggestMeta');
+  const copyTitleBtn = document.getElementById('copyTitle');
+  const copyMetaBtn = document.getElementById('copyMeta');
 
   // Warm the backend (reduces first-hit lag)
   fetch('/api/health').catch(()=>{});
@@ -46,6 +53,50 @@ document.addEventListener('DOMContentLoaded', () => {
         ${data.recommendations?.length ? `<h4>Recommended actions</h4><ul>${data.recommendations.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>` : ''}
       </div>`;
     show(results);
+
+    const dl = document.getElementById('dl');
+    dl.classList.remove('hidden');
+    document.getElementById('dlJson').onclick = () =>
+      download('seo-report.json','application/json', JSON.stringify(data,null,2));
+    document.getElementById('dlPdf').onclick = () => {
+      const w = window.open('', '_blank'); w.document.write(buildReportHTML(data));
+      w.document.close(); w.focus(); setTimeout(()=>{ try{ w.print(); }catch(_){} }, 300);
+    };
+
+    showSuggestBlock(data);
+  }
+
+  function download(name, type, text){
+    const blob = new Blob([text], {type}); const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = name; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function buildReportHTML(data){
+    const e = s => (s||'').toString().replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    const h1 = (data.h1||[]).map(x=>`<li><code>${e(x)}</code></li>`).join('') || '<li>—</li>';
+    return `<!doctype html><html><head><meta charset="utf-8">
+    <title>SEO Report</title>
+    <style>
+      body{font-family:system-ui,Segoe UI,Roboto; margin:32px; color:#0f172a}
+      .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:12px 0}
+      code{background:#f1f5f9;padding:2px 6px;border-radius:6px}
+    </style></head><body>
+    <h1>SEO Report</h1>
+    <div class="card"><b>URL:</b> ${e(data.final_url||'')}</div>
+    <div class="card"><b>Score:</b> ${data.score}/100</div>
+    <div class="card"><b>Title:</b> ${e(data.title)} (${data.title_length})</div>
+    <div class="card"><b>Meta:</b> ${e(data.meta_description)} (${data.meta_description_length})</div>
+    <div class="card"><b>H1:</b><ul>${h1}</ul></div>
+    <div class="card"><b>Canonical:</b> ${e(data.canonical)||'—'}</div>
+    <div class="card"><b>Robots:</b> ${e(data.robots)||'—'}</div>
+    <div class="card"><b>Viewport:</b> ${data.viewport?'Yes':'No'}</div>
+    <div class="card"><b>OG/Twitter:</b> ${data.og_count} / ${data.twitter_count}</div>
+    <div class="card"><b>JSON-LD:</b> ${data.jsonld_count} ${(data.jsonld_types||[]).join(', ')}</div>
+    ${data.recommendations?.length? `<div class="card"><b>Recommended actions</b><ol>${
+      data.recommendations.map(r=>`<li>${e(r)}</li>`).join('')
+    }</ol></div>`:''}
+    </body></html>`;
   }
 
   async function runAnalyze(url){
@@ -87,6 +138,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function showSuggestBlock(data) {
+    suggestBlock.classList.remove('hidden');
+    genSuggestBtn.disabled = false;
+    suggestResults.style.display = 'none';
+    genSuggestBtn.onclick = async () => {
+      genSuggestBtn.disabled = true;
+      suggestTitle.textContent = '...';
+      suggestMeta.textContent = '...';
+      suggestResults.style.display = 'block';
+      // Prepare payload
+      const payload = {
+        title: data.title || '',
+        meta_description: data.meta_description || '',
+        h1: data.h1 || [],
+        keywords: [], // Add keyword extraction if available
+        site_name: data.site_name || ''
+      };
+      try {
+        const res = await fetch('/api/suggest', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const out = await res.json();
+        suggestTitle.textContent = out.title_suggestion || '';
+        suggestMeta.textContent = out.meta_suggestion || '';
+        copyTitleBtn.onclick = () => navigator.clipboard.writeText(out.title_suggestion||'');
+        copyMetaBtn.onclick = () => navigator.clipboard.writeText(out.meta_suggestion||'');
+      } catch(e) {
+        suggestTitle.textContent = 'Error';
+        suggestMeta.textContent = 'Error';
+      } finally {
+        genSuggestBtn.disabled = false;
+      }
+    };
+  }
+
   if (form) form.addEventListener('submit', (e)=>{
     e.preventDefault();
     const url = input.value.trim();
@@ -99,4 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const url  = input?.value.trim() || null;
     if (html) runAnalyzeHtml(html, url); else textarea.focus();
   });
+
+  const u = new URLSearchParams(location.search).get('u');
+  if (u) {
+    input.value = u;
+    runAnalyze(u);
+  }
 });

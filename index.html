@@ -140,6 +140,25 @@
 
           <!-- Results -->
           <div id="results" class="results hidden"></div>
+          <div id="dl" class="results hidden">
+            <button id="dlJson" class="calc-btn">Download JSON</button>
+            <button id="dlPdf"  class="calc-btn">Download Report (PDF)</button>
+          </div>
+
+          <!-- Bookmarklet block -->
+          <div class="bookmarklet-block" style="margin:24px 0 0 0;">
+            <b>Bookmarklet:</b> Drag this to your bookmarks bar →
+            <a href="javascript:(()=>{location.href='https://ai-seo-calculator.netlify.app/?u='+encodeURIComponent(location.href);})()" class="calc-btn" style="font-size:0.95em;">SEO Analyze</a>
+          </div>
+
+          <!-- Suggestion block (hidden by default) -->
+          <div id="suggest-block" class="results hidden" style="margin-top:18px;">
+            <button id="genSuggest" class="calc-btn">Generate suggestions</button>
+            <div id="suggestResults" style="margin-top:12px;display:none;">
+              <div><b>Suggested Title:</b> <span id="suggestTitle"></span> <button id="copyTitle" class="calc-btn" style="font-size:0.9em;">Copy</button></div>
+              <div style="margin-top:8px;"><b>Suggested Meta:</b> <span id="suggestMeta"></span> <button id="copyMeta" class="calc-btn" style="font-size:0.9em;">Copy</button></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
