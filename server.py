@@ -531,3 +531,62 @@ async def analyze(url: HttpUrl, response: Response):
 
     except httpx.RequestError as e:
         raise HTTPException(status_code=504, detail=f"Timeout or network error: {e}")
+
+from pydantic import BaseModel
+
+class SuggestIn(BaseModel):
+    title: str = ""
+    meta_description: str = ""
+    h1: list[str] = []
+    keywords: list[str] = []
+    site_name: str | None = None
+
+class SuggestOut(BaseModel):
+    title_suggestion: str
+    meta_suggestion: str
+    jsonld_org: str | None = None
+    jsonld_website: str | None = None
+
+@app.post("/api/suggest", response_model=SuggestOut)
+def suggest(body: SuggestIn):
+    # Heuristic title
+    head = (body.h1[0] if body.h1 else body.title).strip()
+    key  = (body.keywords[0] if body.keywords else "").strip()
+    base = head or key or "Untitled Page"
+    site = (body.site_name or "").strip()
+    if site and site.lower() not in base.lower():
+        title = f"{base} | {site}"
+    else:
+        title = base
+    if len(title) > 60: title = title[:57].rstrip() + "…"
+
+    # Heuristic meta
+    meta = (body.meta_description or "").strip()
+    if not meta:
+        # build from H1 + keywords
+        bits = [b for b in [head, key] if b]
+        meta = (". ".join(bits) or "Page summary").strip()
+    if len(meta) < 70:  meta = (meta + ".").strip()
+    if len(meta) > 160: meta = meta[:157].rstrip() + "…"
+
+    # Minimal schema (safe defaults)
+    org = {
+        "@context":"https://schema.org","@type":"Organization",
+        "name": site or (key or "Website")
+    }
+    website = {
+        "@context":"https://schema.org","@type":"WebSite",
+        "name": site or (key or "Website"),
+        "potentialAction": {
+          "@type":"SearchAction",
+          "target":"https://example.com/?s={search_term_string}",
+          "query-input":"required name=search_term_string"
+        }
+    }
+    import json
+    return {
+      "title_suggestion": title,
+      "meta_suggestion": meta,
+      "jsonld_org": json.dumps(org, ensure_ascii=False),
+      "jsonld_website": json.dumps(website, ensure_ascii=False),
+    }
